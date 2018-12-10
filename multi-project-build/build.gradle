@@ -11,3 +11,12 @@ subprojects {
 }
 
 task build{}
+
+release {
+    tagTemplate = '${version}'
+    failOnUnversionedFiles = false
+    failOnSnapshotDependencies = false
+    git {
+        requireBranch = 'master'
+    }
+}
