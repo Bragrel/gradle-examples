@@ -31,13 +31,3 @@ dependencies {
     compile 'log4j:log4j:1.2.17'
     compile project(':core')
 }
-
-
-release {
-    tagTemplate = '${name}-${version}'
-    failOnUnversionedFiles = false
-    failOnSnapshotDependencies = false
-    git {
-        requireBranch = 'master'
-    }
-}
