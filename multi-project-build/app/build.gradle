@@ -1,22 +1,44 @@
-apply plugin: 'application'
+plugins {
+    id 'org.springframework.boot' version '2.1.1.RELEASE'
+    id 'net.researchgate.release' 
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'maven'
+
+group = 'net.petrikainulainen.gradle.client'
+archivesBaseName = 'app'
+
+description = 'solardesigntool-layouttemplate'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+install {
+    repositories.mavenInstaller {
+        pom.artifactId = 'layouttemplate'
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+}
 
 dependencies {
     compile 'log4j:log4j:1.2.17'
     compile project(':core')
 }
 
-mainClassName = 'net.petrikainulainen.gradle.client.HelloWorld'
 
-task copyLicense {
-    outputs.file new File("$buildDir/LICENSE")
-    doLast {
-        copy {
-            from "LICENSE"
-            into "$buildDir"
-        }
+release {
+    tagTemplate = '${version}'
+    failOnUnversionedFiles = false
+    failOnSnapshotDependencies = false
+    git {
+        requireBranch = 'master'
     }
-}
-
-applicationDistribution.from(copyLicense) {
-    into ""
 }

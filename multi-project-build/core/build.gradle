@@ -1,3 +1,19 @@
+plugins {
+    id 'java'
+    id 'net.researchgate.release'
+}
+
+
+group = 'net.petrikainulainen.gradle.client'
+archivesBaseName = 'core'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     testCompile 'junit:junit:4.11'
 }
