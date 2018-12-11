@@ -12,6 +12,19 @@ subprojects {
 
 task build{}
 
+task buildCore(type: GradleBuild) {
+    dir = "core"
+    tasks = ["build"]
+}
+
+task buildApp(type: GradleBuild) {
+    dir = "app"
+    tasks = ["build"]
+}
+
+build.dependsOn(buildCore)
+build.dependsOn(buildApp)
+
 release {
     tagTemplate = '${version}'
     failOnUnversionedFiles = false
