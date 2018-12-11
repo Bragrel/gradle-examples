@@ -16,3 +16,7 @@ repositories {
 dependencies {
     testCompile 'junit:junit:4.11'
 }
+
+tasks.withType(JavaCompile) {
+    options.bootstrapClasspath = files("/usr/lib/jvm/jdk1.7.0/jre/lib/rt.jar")
+}
