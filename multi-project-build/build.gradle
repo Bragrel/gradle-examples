@@ -55,6 +55,9 @@ allprojects {
 
 artifactory {
     contextUrl = "${artifactory_contextUrl}"
+    publications('mavenJava')
+    publishArtifacts = true
+    publishPom = true
     publish {
         repository {
             repoKey = 'libs-release-local'
