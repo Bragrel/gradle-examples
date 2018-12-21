@@ -2,9 +2,16 @@ plugins {
     id 'java'
 }
 
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'maven'
 
 group = 'net.petrikainulainen.gradle.client'
-archivesBaseName = 'core'
+install {
+    repositories.mavenInstaller {
+        pom.artifactId = 'sample-core'
+    }
+}
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7

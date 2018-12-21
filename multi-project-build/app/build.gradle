@@ -10,14 +10,12 @@ apply plugin: 'maven'
 group = 'net.petrikainulainen.gradle.client'
 archivesBaseName = 'app'
 
-description = 'solardesigntool-layouttemplate'
-
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 install {
     repositories.mavenInstaller {
-        pom.artifactId = 'layouttemplate'
+        pom.artifactId = 'sample-app'
     }
 }
 
