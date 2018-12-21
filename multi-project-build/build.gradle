@@ -38,6 +38,7 @@ task buildApp(type: GradleBuild) {
 
 build.dependsOn(buildCore)
 build.dependsOn(buildApp)
+afterReleaseBuild.dependsOn(artifactoryPublish)
 
 release {
     tagTemplate = '${version}'
@@ -47,8 +48,6 @@ release {
         requireBranch = 'master'
     }
 }
-
-artifactoryPublish.dependsOn(release)
 
 allprojects {
     apply plugin: "com.jfrog.artifactory"
