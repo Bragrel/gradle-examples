@@ -15,6 +15,7 @@ plugins {
     id 'net.researchgate.release' version '2.7.0'
 }
 apply plugin: "com.jfrog.artifactory"
+apply plugin: 'maven-publish'
 
 subprojects {
     apply plugin: 'java'
@@ -55,15 +56,16 @@ allprojects {
 
 artifactory {
     contextUrl = "${artifactory_contextUrl}"
-    publications('mavenJava')
-    publishArtifacts = true
-    publishPom = true
     publish {
         repository {
             repoKey = 'libs-release-local'
             username = "${artifactory_user}"
             password = "${artifactory_password}"
             maven = true
+        }
+        defaults {
+            publishArtifacts = true
+            publishPom = true
         }
     }
     resolve {
@@ -74,4 +76,5 @@ artifactory {
             maven = true
         }
     }
+
 }
