@@ -17,14 +17,6 @@ plugins {
 apply plugin: "com.jfrog.artifactory"
 apply plugin: 'maven-publish'
 
-subprojects {
-    apply plugin: 'java'
-
-    repositories {
-        mavenCentral()
-    }
-}
-
 task build {}
 
 task buildCore(type: GradleBuild) {
@@ -62,41 +54,6 @@ allprojects {
             credentials {
                 username "${artifactory_user}"
                 password "${artifactory_password}"
-            }
-        }
-    }
-
-    artifactory {
-        contextUrl = "${artifactory_contextUrl}"
-        publish {
-            repository {
-                repoKey = "${artifactoryRepoKey}" // The Artifactory repository key to publish to
-                username = "${artifactory_user}" // The publisher user name
-                password = "${artifactory_password}" // The publisher password
-            }
-            defaults {
-                // Reference to Gradle configurations defined in the build script.
-                // This is how we tell the Artifactory Plugin which artifacts should be
-                // published to Artifactory.
-                publishConfigs('archives', 'published')
-                // Properties to be attached to the published artifacts.
-//            properties = ['qa.level': 'basic', 'dev.team' : 'core']
-                // You can also attach properties to published artifacts according to
-                // the following notation:
-                // <configuration name> <artifact spec>
-                // The <configuration name> should be the name of the relevant Gradle Configuration or 'all'
-                // (for all configurations).
-                // Artifact spec has the following structure:
-                // group:artifact:version:classifier@ext
-                // Any element in the artifact spec notation can contain the * and ? wildcards.
-                // For example:
-                // org.acme:*:1.0.?_*:*@tgz
-//            properties {
-//                all '*:*:1.*:*@*', key1: 'val1', key2: 'val2'
-//                all 'org.jfrog.*:*:1.*:*@jar*', key3: 'val3', key4: 'val4'
-//            }
-                publishPom = true // Publish generated POM files to Artifactory (true by default)
-                publishIvy = false
             }
         }
     }
@@ -140,7 +97,13 @@ task setReleaseRepo {
 
 build.dependsOn(buildCore)
 build.dependsOn(buildApp)
-afterReleaseBuild.dependsOn(artifactoryPublish)
+afterReleaseBuild.dependsOn(artifactoryPublishWorkaround)
+
+task artifactoryPublishWorkaround(type: GradleBuild) {
+    dir = "."
+    tasks = ["artifactoryPublish"]
+
+}
 
 task beforeRelease {
     doLast {
@@ -153,3 +116,39 @@ release {
     buildTasks = ['build', 'beforeRelease']
 }
 
+artifactory {
+    contextUrl = "${artifactory_contextUrl}"
+    publish {
+        repository {
+            repoKey = "${artifactoryRepoKey}" // The Artifactory repository key to publish to
+            username = "${artifactory_user}" // The publisher user name
+            password = "${artifactory_password}" // The publisher password
+        }
+        defaults {
+            // Reference to Gradle configurations defined in the build script.
+            // This is how we tell the Artifactory Plugin which artifacts should be
+            // published to Artifactory.
+            publishArtifacts = true
+//            publications('mavenJava')
+            publishConfigs('archives', 'published')
+            // Properties to be attached to the published artifacts.
+//            properties = ['qa.level': 'basic', 'dev.team' : 'core']
+            // You can also attach properties to published artifacts according to
+            // the following notation:
+            // <configuration name> <artifact spec>
+            // The <configuration name> should be the name of the relevant Gradle Configuration or 'all'
+            // (for all configurations).
+            // Artifact spec has the following structure:
+            // group:artifact:version:classifier@ext
+            // Any element in the artifact spec notation can contain the * and ? wildcards.
+            // For example:
+            // org.acme:*:1.0.?_*:*@tgz
+//            properties {
+//                all '*:*:1.*:*@*', key1: 'val1', key2: 'val2'
+//                all 'org.jfrog.*:*:1.*:*@jar*', key3: 'val3', key4: 'val4'
+//            }
+            publishPom = true // Publish generated POM files to Artifactory (true by default)
+            publishIvy = false
+        }
+    }
+}
