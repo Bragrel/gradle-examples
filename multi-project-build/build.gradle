@@ -95,15 +95,17 @@ task setReleaseRepo {
     }
 }
 
-build.dependsOn(buildCore)
-build.dependsOn(buildApp)
-afterReleaseBuild.dependsOn(artifactoryPublishWorkaround)
-
 task artifactoryPublishWorkaround(type: GradleBuild) {
     dir = "."
     tasks = ["artifactoryPublish"]
 
 }
+
+build.dependsOn(buildCore)
+build.dependsOn(buildApp)
+afterReleaseBuild.dependsOn(artifactoryPublishWorkaround)
+
+
 
 task beforeRelease {
     doLast {
