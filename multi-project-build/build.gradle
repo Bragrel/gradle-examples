@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         //Check for the latest version here: http://plugins.gradle.org/plugin/com.jfrog.artifactory
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.8.1"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:+"
     }
 }
 
@@ -25,7 +25,7 @@ subprojects {
     }
 }
 
-task build{}
+task build {}
 
 task buildCore(type: GradleBuild) {
     dir = "core"
@@ -37,10 +37,6 @@ task buildApp(type: GradleBuild) {
     tasks = ["build"]
 }
 
-build.dependsOn(buildCore)
-build.dependsOn(buildApp)
-afterReleaseBuild.dependsOn(artifactoryPublish)
-
 release {
     tagTemplate = '${version}'
     failOnUnversionedFiles = false
@@ -50,31 +46,109 @@ release {
     }
 }
 
-allprojects {
-    apply plugin: "com.jfrog.artifactory"
+artifactoryPublish.skip = true
 
-    artifactory {
-        contextUrl = "${artifactory_contextUrl}"
-        publish {
-            repository {
-                repoKey = 'libs-release-local'
-                username = "${artifactory_user}"
-                password = "${artifactory_password}"
-                maven = true
-            }
-            defaults {
-                publishArtifacts = true
-                publishPom = true
-            }
-        }
-        resolve {
-            repository {
-                repoKey = 'libs-release'
-                username = "${artifactory_user}"
-                password = "${artifactory_password}"
-                maven = true
+allprojects {
+    apply plugin: 'com.jfrog.artifactory'
+    apply plugin: 'idea'
+    configure(subprojects.findAll { new File(it.projectDir, 'src').directory }) {
+        apply plugin: 'java'
+    }
+    group = 'net.petrikainulainen.gradle'
+    status = 'Integration'
+    repositories {
+        maven {
+            url "${artifactory_contextUrl}" // The Artifactory (preferably virtual) repository to resolve from
+            credentials {
+                username "${artifactory_user}"
+                password "${artifactory_password}"
             }
         }
     }
 }
 
+subprojects {
+    apply plugin: 'maven'
+
+    if (project.plugins.hasPlugin('java')) {
+        //manifest.mainAttributes(provider: 'gradle')
+        manifest {
+            attributes 'provider': 'gradle'
+        }
+        configurations {
+            published
+        }
+        task sourceJar(type: Jar) {
+            from sourceSets.main.allSource
+            classifier = 'sources'
+        }
+        artifactoryPublish {
+            dependsOn sourceJar
+        }
+        artifacts {
+            published sourceJar
+        }
+    }
+}
+
+configurations {
+    published
+}
+
+ext.set("artifactoryRepoKey", 'libs-snapshot-local')
+
+task setReleaseRepo {
+    doLast {
+        artifactoryRepoKey = 'libs-release-local'
+    }
+}
+
+build.dependsOn(buildCore)
+build.dependsOn(buildApp)
+afterReleaseBuild.dependsOn(artifactoryPublish)
+
+task beforeRelease {
+    doLast {
+        artifactoryRepoKey = 'libs-release-local'
+    }
+}
+
+
+release {
+    buildTasks = ['build', 'beforeRelease']
+}
+
+artifactory {
+    contextUrl = "${artifactory_contextUrl}"
+    publish {
+        repository {
+            repoKey = "${artifactoryRepoKey}" // The Artifactory repository key to publish to
+            username = "${artifactory_user}" // The publisher user name
+            password = "${artifactory_password}" // The publisher password
+        }
+        defaults {
+            // Reference to Gradle configurations defined in the build script.
+            // This is how we tell the Artifactory Plugin which artifacts should be
+            // published to Artifactory.
+            publishConfigs('archives', 'published')
+            // Properties to be attached to the published artifacts.
+//            properties = ['qa.level': 'basic', 'dev.team' : 'core']
+            // You can also attach properties to published artifacts according to
+            // the following notation:
+            // <configuration name> <artifact spec>
+            // The <configuration name> should be the name of the relevant Gradle Configuration or 'all'
+            // (for all configurations).
+            // Artifact spec has the following structure:
+            // group:artifact:version:classifier@ext
+            // Any element in the artifact spec notation can contain the * and ? wildcards.
+            // For example:
+            // org.acme:*:1.0.?_*:*@tgz
+//            properties {
+//                all '*:*:1.*:*@*', key1: 'val1', key2: 'val2'
+//                all 'org.jfrog.*:*:1.*:*@jar*', key3: 'val3', key4: 'val4'
+//            }
+            publishPom = true // Publish generated POM files to Artifactory (true by default)
+            publishIvy = false
+        }
+    }
+}
