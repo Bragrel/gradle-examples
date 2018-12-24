@@ -114,11 +114,20 @@ release {
     buildTasks = ['setReleaseRepo', 'build']
 }
 
+def getRepo = {
+    String ver = project.version
+    if (ver.endsWith('SNAPSHOT')){
+        return 'libs-snapshot-local'
+    } else {
+        return 'libs-release-local'
+    }
+}
+
 artifactory {
     contextUrl = "${artifactory_contextUrl}"
     publish {
         repository {
-            repoKey = "${artifactoryRepoKey}" // The Artifactory repository key to publish to
+            repoKey = getRepo() // The Artifactory repository key to publish to
             username = "${artifactory_user}" // The publisher user name
             password = "${artifactory_password}" // The publisher password
         }
