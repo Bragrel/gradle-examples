@@ -111,8 +111,7 @@ task setReleaseRepo {
 
 
 release {
-    setReleaseRepo
-    buildTasks = ['build']
+    buildTasks = ['setReleaseRepo', 'build']
 }
 
 artifactory {
