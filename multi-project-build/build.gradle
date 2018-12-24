@@ -87,13 +87,10 @@ configurations {
     published
 }
 
-ext.set("artifactoryRepoKey", 'libs-snapshot-local')
+//ext.set("artifactoryRepoKey", 'libs-snapshot-local')
 
-task setReleaseRepo {
-    doLast {
-        artifactoryRepoKey = 'libs-release-local'
-    }
-}
+def artifactoryRepoKey ='libs-snapshot-local'
+
 
 task artifactoryPublishWorkaround(type: GradleBuild) {
     dir = "."
@@ -101,26 +98,20 @@ task artifactoryPublishWorkaround(type: GradleBuild) {
 
 }
 
-artifactoryPublish{
-        doFirst{
-            setReleaseRepo
-        }
-}
-
 build.dependsOn(buildCore)
 build.dependsOn(buildApp)
 afterReleaseBuild.dependsOn(artifactoryPublishWorkaround)
 
 
-
-//task beforeRelease {
-//    doFirst {
-//        artifactoryRepoKey = 'libs-release-local'
-//    }
-//}
+task setReleaseRepo {
+    doFirst {
+        artifactoryRepoKey = 'libs-release-local'
+    }
+}
 
 
 release {
+    setReleaseRepo
     buildTasks = ['build']
 }
 
