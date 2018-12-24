@@ -96,8 +96,11 @@ task setReleaseRepo {
 }
 
 task artifactoryPublishWorkaround(type: GradleBuild) {
+    doFirst {
+        artifactoryRepoKey = 'libs-release-local'
+    }
     dir = "."
-    tasks = ["beforeRelease", "artifactoryPublish"]
+    tasks = ["artifactoryPublish"]
 
 }
 
@@ -107,11 +110,11 @@ afterReleaseBuild.dependsOn(artifactoryPublishWorkaround)
 
 
 
-task beforeRelease {
-    doFirst {
-        artifactoryRepoKey = 'libs-release-local'
-    }
-}
+//task beforeRelease {
+//    doFirst {
+//        artifactoryRepoKey = 'libs-release-local'
+//    }
+//}
 
 
 release {
