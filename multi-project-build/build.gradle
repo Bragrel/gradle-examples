@@ -108,7 +108,7 @@ afterReleaseBuild.dependsOn(artifactoryPublishWorkaround)
 
 
 task beforeRelease {
-    doLast {
+    doFirst {
         artifactoryRepoKey = 'libs-release-local'
     }
 }
