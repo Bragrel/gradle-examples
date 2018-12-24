@@ -9,7 +9,7 @@ apply plugin: 'maven'
 group = 'net.petrikainulainen.gradle.client'
 install {
     repositories.mavenInstaller {
-        pom.artifactId = 'sample-core'
+        pom.artifactId = 'core'
     }
 }
 

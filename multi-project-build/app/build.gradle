@@ -15,7 +15,7 @@ targetCompatibility = 1.8
 
 install {
     repositories.mavenInstaller {
-        pom.artifactId = 'sample-app'
+        pom.artifactId = 'app'
     }
 }
 
