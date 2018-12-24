@@ -97,7 +97,7 @@ task setReleaseRepo {
 
 task artifactoryPublishWorkaround(type: GradleBuild) {
     dir = "."
-    tasks = ["artifactoryPublish"]
+    tasks = ["beforeRelease", "artifactoryPublish"]
 
 }
 
@@ -115,7 +115,7 @@ task beforeRelease {
 
 
 release {
-    buildTasks = ['build', 'beforeRelease']
+    buildTasks = ['build']
 }
 
 artifactory {
